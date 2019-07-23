@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href='http://fonts.googleapis.com/css?family=Oleo+Script' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.4/firebase-app.js"></script>
+    <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.4/firebase-database.js"></script>
+    <title>Train Times</title>
+</head>
+<style>
+    .btn {
+        margin:20px;
+    }
+
+    .flex-container {
+        margin-right: 11%;
+        margin-left: 11%;
+   
+    }
+    .jumbotron {
+        background-color: #007bff;
+        color: white;
+    }
+
+    #addbutton {
+        padding-top: 20px;
+    }
+
+    .card {
+        margin: 30px;
+    }
+    .form-group {
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 20px;
+    }
+
+    #title1 {
+        font-size: 30px;
+    }
+
+    #title2 {
+        font-size: 30px;
+    }
+    .card-header {
+        background-color: #007bff;
+        color: white;
+        font-size: 80px;
+    }
+</style>
+<body>
+
+<div class="flex-container">
+
+        <div class="jumbotron jumbotron-fluid">
+                <div class="container">
+                  <h1 class="display-4">Train Tracker</h1>
+                  <p class="lead">Please enter any new train information below</p>
+                </div>
+              </div>
+    
+
+    <hr>
+
+    <div class="card">
+            <div class="card-header" id="title1">
+              Train List
+            </div>
+
+    <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Train Name</th>
+                <th scope="col">Destination</th>
+                <th scope="col">Frequency (min)</th>
+                <th scope="col">Next Arrival</th>
+                <th scope="col">Minutes Away</th>
+              </tr>
+            </thead>
+            <tbody id="tbody">
+         
+            
+            </tbody>
+           </table>
+
+        </div>
+
+        
+
+           <div class="card">
+                <div class="card-header" id="title2">
+                  Add a train
+                </div>
+      
+          
+
+    <form>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Train Name</label>
+              <input type="form-control" class="form-control" id="train" aria-describedby="emailHelp" placeholder="Crazy Train">
+              <small id="train" class="form-text text-muted"></small>
+            </div>
+
+            <div class="form-group">
+                    <label for="exampleInputEmail1">Destination</label>
+                    <input type="form-control" class="form-control" id="destination" aria-describedby="emailHelp" placeholder="Yuma">
+                    <small id="destination" class="form-text text-muted"></small>
+                  </div>
+
+        <div class="form-group">
+                <label for="exampleInputEmail1">First Train Time (military time)</label>
+                <input type="form-control" class="form-control" id="time" aria-describedby="emailHelp" placeholder="HH:mm">
+                <small id="time" class="form-text text-muted"></small>
+                </div>
+
+         <div class="form-group">
+            <label for="exampleInputEmail1">Frequency (min)</label>
+            <input type="form-control" class="form-control" id="frequency" aria-describedby="emailHelp" placeholder="Every 30 minutes ">
+            <small id="frequency" class="form-text text-muted"></small>
+            </div>
+
+        
+            <button type="submit" class="btn btn-primary" id="adduser">Submit</button>
+          </form>
+
+        </div>
+          
+</div>
+
+    <script>
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                apiKey: "AIzaSyBHd7RedpgIhSBqy-ppSK8dhvdyfAzNaGo",
+                authDomain: "testing-46748.firebaseapp.com",
+                databaseURL: "https://testing-46748.firebaseio.com",
+                projectId: "testing-46748",
+                storageBucket: "",
+                messagingSenderId: "391445596555",
+                appId: "1:391445596555:web:d656b19d8465eb95"
+            };
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            // Create a variable to reference the database
+            var database = firebase.database();
+
+
+            $("#adduser").on("click", function(event) {
+
+            event.preventDefault();
+
+          
+            let train = $("#train").val().trim();
+            let destination = $("#destination").val().trim();
+            let time = $("#time").val().trim();
+            let frequency = $("#frequency").val().trim();
+
+    
+            database.ref().push({
+                train: train,
+                destination: destination,
+                time: time,
+                frequency: frequency,
+                dateAdded: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            });
+
+
+   
+
+            creator = function() {
+                
+                database.ref().on("child_added", function(snapshot) {
+
+                    let snap = snapshot.val()
+
+
+                    let train = snap.train
+                    let destination = snap.destination
+                    let time = snap.time
+                    let frequency = snap.frequency
+
+                    let empty = $("<tr>")
+
+                        
+
+                    let td1 = $("<td>")
+                    td1.text(train)
+                    empty.append(td1)
+
+                    
+                    let td2 = $("<td>")
+                    td2.text(destination)
+                    empty.append(td2)
+
+                    let td3 = $("<td>")
+                    td3.text(frequency)
+                    empty.append(td3)
+
+
+                    let td4 = $("<td>")
+                    let departure = moment(time, "HH:mm")
+                    let currentTime = moment();
+                    let difference = currentTime.diff(departure, "minutes");
+                    let timeRemainder = difference % frequency;
+                    let minutesleft = frequency - timeRemainder;
+                    let nextTrain = moment().add(minutesleft, 'minutes');
+                    nextTrain = moment(nextTrain).format('h:mm A');
+                    td4.text(nextTrain)
+                    empty.append(td4)
+
+
+                    let td5 = $("<td>")
+                    td5.text(minutesleft)
+                    empty.append(td5)
+
+
+
+                    $("#tbody").append(empty)
+
+
+                }, function(errorObject) {
+                     console.log("The read failed: " + errorObject.code);
+                });
+        }
+
+
+        creator()
+
+        repeater = function() {
+
+            $("#tbody").empty()
+            creator() 
+                
+        }
+
+        const serverTime = firebase.database.ServerValue.TIMESTAMP;
+        setInterval(() => {
+            repeater()
+        }, 60000);
+    
+    
+    
+    
+    
+    </script>
+    
+</body>
+</html> 
